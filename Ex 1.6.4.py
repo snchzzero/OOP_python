@@ -7,6 +7,14 @@
 # текущего объекта с локальными атрибутами x, y и соответствующими значениями.
 # Создайте в программе объект pt класса Point и еще один объект pt_clone через вызов метода clone.
 # P.S. В программе на экран ничего выводить не нужно.
+class Point:
+    __instance = None
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
+    def clone(self):
+        return Point(self.x, self.y)
 
-
+pt = Point(1, 3)
+pt_clone = pt.clone()

@@ -7,12 +7,12 @@
 #P.S. В программе на экран ничего выводить не нужно.
 
 class SingletonFive():
-    __instance = None
+    __instance = None  # сылка на экземпляр класса
     total = 0
 
     def __new__(cls, *args, **kwargs):
         if cls.total < 5:
-            cls.__instance = super().__new__(cls)
+            cls.__instance = super().__new__(cls)  # адрес нового объекта
             cls.total += 1
         return cls.__instance
     def __init__(self, name):
