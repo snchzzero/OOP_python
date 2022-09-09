@@ -16,7 +16,7 @@ class Line:
 
 
     def draw(self):
-        return (self.__x1, self.__y1, self.__x2, self.__y2)
+        print (self.__x1, self.__y1, self.__x2, self.__y2)
 
 line = Line(1, 2, 3, 4)
 print(line.get_coords())
