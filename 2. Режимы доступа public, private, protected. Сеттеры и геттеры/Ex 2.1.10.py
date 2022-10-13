@@ -33,17 +33,34 @@ class EmailValidator:
                     new_email += s
             total += 1
         total = 0
-        print(new_email)
-
-
+        return new_email
+        #print(new_email)
 
 
     @classmethod
     def check_email(cls, email):
-        pass
+        if cls.__is_email_str(email):
+            l1 = [i for i in email.split("@")]
+            if len(l1) == 2:
+                if len(l1[0]) < 101 and len(l1[1]) < 51:
+                    if l1[1].count('.') >= 1:
+                        for s in range (1, len(email)):
+                            if email[s-1] == email[s] == '.':
+                                return False
+                        return True
+        return False
 
     @staticmethod
-    def __is_email_str(self, email):
+    def __is_email_str(email):
         return True if type(email) == str else False
 
-EmailValidator.get_random_email()
+
+#print(EmailValidator.check_email('x8nxv2k2v16_@cgi_lrkoo17kju9r5ezvs.4k'))
+assert EmailValidator.check_email("sc_lib@list.ru") == True and EmailValidator.check_email("sc_lib@list_ru") == False and EmailValidator.check_email("sc@lib@list_ru") == False and EmailValidator.check_email("sc.lib@list_ru") == False and EmailValidator.check_email("sclib@list.ru") == True and EmailValidator.check_email("sc.lib@listru") == False and EmailValidator.check_email("sc..lib@list.ru") == False, "метод check_email отработал некорректно"
+
+m = EmailValidator.get_random_email()
+assert EmailValidator.check_email(m) == True, "метод check_email забраковал сгенерированный email методом get_random_email"
+
+assert EmailValidator() is None, "при создании объекта класса EmailValidator возвратилось значение отличное от None"
+
+assert EmailValidator._EmailValidator__is_email_str('abc'), "метод __is_email_str() вернул False для строки"
