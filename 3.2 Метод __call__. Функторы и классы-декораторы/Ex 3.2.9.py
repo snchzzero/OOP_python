@@ -22,12 +22,12 @@ class Handler:
 
 
 
-# @Handler(methods=('GET', 'POST')) # по умолчанию methods = ('GET',)
-# def contact(request):
-#     return "Сергей Балакирев"
-#
-# res = contact({"method": "POST", "url": "contact.html"})
-# print(res)
+@Handler(methods=('GET', 'POST')) # по умолчанию methods = ('GET',)
+def contact(request):
+    return "Сергей Балакирев"
+
+res = contact({"method": "POST", "url": "contact.html"})
+print(res)
 
 assert hasattr(Handler, 'get') and hasattr(Handler, 'post'), "класс Handler должен содержать методы get и post"
 
