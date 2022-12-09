@@ -12,26 +12,36 @@ class LinkedList:
             obj.prev = self.tail
             self.tail = obj
         self.l1.append(obj)
+        #print(obj.__dict__)
 
     def remove_obj(self, indx):
-        total = 0
-        obj = self.head
-        while total < indx:
-            obj = obj.next
-            total += 1
-        if obj != self.tail and obj != self.head:
-            obj.prev.next = obj.next
-            obj.next.prev = obj.prev
-        elif obj == self.tail and len(self.l1) > 1:
-            obj.prev.next = None
-            self.tail = obj.prev
-        elif obj == self.head and len(self.l1) > 1:
-            obj.next.prev = None
-            self.head = obj.next
-        elif len(self.l1) == 1:
-            self.head = None
-            self.tail = None
-        self.l1.pop(indx)
+        if indx in range(len(self.l1)):
+            total = 0
+            obj = self.head
+            while total < indx:
+                obj = obj.next
+                total += 1
+            if obj != self.tail and obj != self.head:
+                obj.prev.next = obj.next
+                obj.next.prev = obj.prev
+            elif obj == self.tail and len(self.l1) > 1:
+                if obj.prev:
+                    obj.prev.next = None
+                    self.tail = obj.prev
+            elif obj == self.head and len(self.l1) > 1:
+                if obj.next:
+                    obj.next.prev = None
+                    self.head = obj.next
+            elif len(self.l1) == 1:
+                self.head = None
+                self.tail = None
+            if len(self.l1) > 0:
+                #print(f'head: {self.head.__dict__}')
+                #print(f'tail: {self.tail.__dict__}')
+                #print(f'obj_del: {obj.__dict__}')
+                self.l1.pop(indx)
+                if len(self.l1) == 0:
+                    self.head, self.tail = None, None
 
     def __len__(self):
         return len(self.l1)
@@ -51,6 +61,23 @@ class ObjList:
         self.__data = data
         self.__prev = prev
         self.__next = next
+
+    # def __getattr__(self, key):
+    #     if key in ['_ObjList__data', '_LinkedList__data']:
+    #         return self.__dict__["__data"]
+    #     elif key in ['_ObjList__next', '_LinkedList__next']:
+    #         return self.__dict__["__next"]
+    #     elif key in ['_ObjList__prev', '_LinkedList__prev']:
+    #         return self.__dict__["__prev"]
+    #
+    # def __setattr__(self, key, value):
+    #     if key in ['_ObjList__data', '_LinkedList__data']:
+    #         self.__dict__["__data"] = value
+    #     elif key in ['_ObjList__next', '_LinkedList__next']:
+    #         self.__dict__["__next"] = value
+    #     elif key in ['_ObjList__prev', '_LinkedList__prev']:
+    #         self.__dict__["__prev"] = value
+
 
     @property
     def prev(self):
@@ -85,7 +112,8 @@ ln = LinkedList()
 ln.add_obj(ObjList("Сергей"))
 ln.add_obj(ObjList("Балакирев"))
 ln.add_obj(ObjList("Python ООП"))
-#ln.remove_obj(1)
+#ln.remove_obj(0)
+#ln.remove_obj(0)
 ln.remove_obj(2)
 assert len(ln) == 2, "функция len вернула неверное число объектов в списке, возможно, неверно работает метод remove_obj()"
 ln.add_obj(ObjList("Python"))
