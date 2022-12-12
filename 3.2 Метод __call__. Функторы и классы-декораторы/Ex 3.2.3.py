@@ -14,6 +14,7 @@ class RandomPassword:
         return password
 
 
+
 rnd = RandomPassword("qwertyuiopasdfghjklzxcvbnm0123456789!@#$%&*", 5, 20)
 lst_pass = [rnd() for _ in range(3)]
 
