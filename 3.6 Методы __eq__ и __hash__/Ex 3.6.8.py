@@ -7,9 +7,7 @@ class DataBase:
         self.dict_db[record.pk] = [record]
 
     def read(self, pk):
-        return self.dict_db[pk]
-
-
+        return self.dict_db[pk][0]
 
 class Record:
     total = 0
@@ -33,7 +31,7 @@ class Record:
         return hash(self) == hash(other)
 
 #lst_in = list(map(str.strip, sys.stdin.readlines()))
-lst_in = ['Балакирев С.М.; программист; 33', 'Балакирев С.М.; прогdраммист; 33',
+lst_in = ['Балакирев С.М.; программист; 33',
 'Кузнецов А.В.; разведчик-нелегал; 35',
 'Суворов А.В.; полководец; 42',
 'Иванов И.И.; фигурант всех подобных списков; 26',
@@ -42,16 +40,21 @@ db = DataBase('path')
 for i in lst_in:
     fio = (i.split(';')[0])
     descr = (i.split(';')[1].lstrip())
-    old = float(i.split(';')[2].lstrip())
+    old = int(i.split(';')[2].lstrip())
     new = Record(fio, descr, old)
-    print(hash(new))
-    db.write(new)
+    #print(hash(new))
+    #db.write(new)
+    flag = False
     for key in db.dict_db.keys():
-        print(hash(key))
-        if hash(key) == hash(new):
-            db.dict_db[key].append(new)
+        for obj in db.dict_db[key]:
+            if hash(new) == hash(obj):
+                db.dict_db[key].append(new)
+                flag = True
+                break
+    if flag == False:
+        db.write(new)
 
-print(db.dict_db)
+#print(db.dict_db)
 
 db22345 = DataBase('123')
 r1 = Record('fio', 'descr', 10)
@@ -60,8 +63,7 @@ assert r1.pk != r2.pk, "равные значения атрибута pk у р�
 
 db22345.write(r2)
 r22 = db22345.read(r2.pk)
-print(r22.pk)
-print(r2.pk)
+
 assert r22.pk == r2.pk and r22.fio == r2.fio and r22.descr == r2.descr and r22.old == r2.old, "при операциях write и read прочитанный объект имеет неверные значения атрибутов"
 
 assert len(db22345.dict_db) == 1, "неверное число объектов в словаре dict_db"
