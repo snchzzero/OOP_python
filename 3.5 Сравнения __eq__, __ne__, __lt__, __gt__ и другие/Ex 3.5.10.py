@@ -1,41 +1,42 @@
-class Box:
-    def __init__(self):
-        self.list = []
-
-    def add_thing(self, obj):
-        self.list.append(obj)
-
-    def get_things(self):
-        return self.list
-
-    def __eq__(self, other):
-        total = 0
-        for si in self.list:
-            for oi in other.list:
-                if oi == si:
-                    total += 1
-                    break
-        return total == len(self.list)
-
-class Thing:
-    def __init__(self, name, mass):
+class Body:
+    def __init__(self, name, ro, volume):
         self.name = name
-        self.mass = mass
+        self.ro = ro
+        self.volume = volume
 
     def __eq__(self, other):
-        return self.name.lower() == other.name.lower() and self.mass == other.mass
+        if type(other) == int or type(other) == float:
+            return (self.ro * self.volume) == other
+        else:
+            return (self.ro * self.volume) == (other.ro * other.volume)
 
+    def __lt__(self, other):
+        if type(other) == int or type(other) == float:
+            return (self.ro * self.volume) < other
+        else:
+            return (self.ro * self.volume) < (other.ro * other.volume)
 
-b1 = Box()
-b2 = Box()
+    def __le__(self, other):
+        if type(other) == int or type(other) == float:
+            return (self.ro * self.volume) <= other
+        else:
+            return (self.ro * self.volume) <= (other.ro * other.volume)
 
-b1.add_thing(Thing('Мел', 100))
-b1.add_thing(Thing('тряпка', 200))
-b1.add_thing(Thing('доска', 2000))
+    def __gt__(self, other):
+        if type(other) == int or type(other) == float:
+            return (self.ro * self.volume) > other
+        else:
+            return (self.ro * self.volume) > (other.ro * other.volume)
 
-b2.add_thing(Thing('тряпка', 200))
-b2.add_thing(Thing('мел', 100))
-b2.add_thing(Thing('доска', 2000))
-
-res = b1 != b2 # True
-print(res)
+    def __ge__(self, other):
+        if type(other) == int or type(other) == float:
+            return (self.ro * self.volume) >= other
+        else:
+            return (self.ro * self.volume) >= (other.ro * other.volume)
+body1 = Body('body1', 6, 10)
+body2 = Body('body1', 5, 10)
+# print(body1 <= body2)  # True, если масса тела body1 больше массы тела body2
+# print(body1 == body2) # True, если масса тела body1 равна массе тела body2
+# print(body1 < 10)     # True, если масса тела body1 меньше 10
+# print(body2 == 50)     # True, если масса тела body2 равна 5
+print(50 == body1)
