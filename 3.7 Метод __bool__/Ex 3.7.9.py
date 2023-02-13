@@ -1,28 +1,28 @@
-import random
+from random import randint
 class GamePole:
-    count = 0
     __instance = None
+
     def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
             return cls.__instance
-
-
+        else:
+            return cls.__instance
 
     def __init__(self, N, M, total_mines):
-        self.N = N
-        self.M = M
-        self.total_mines = total_mines
-        self.__pole_cels = tuple(tuple(Cell() for m in range(self.M)) for n in range(self.N))
-
+            self.__instance = self
+            self.N = N
+            self.M = M
+            self.total_mines = total_mines
+            self.__pole_cels = tuple(tuple(Cell() for m in range(self.M)) for n in range(self.N))
 
 
     def init_pole(self):
         # инициализации начального состояния игрового поля
         total = 0
         while total < self.total_mines:
-            n = random.randint(0, self.N - 1)
-            m = random.randint(0, self.M - 1)
+            n = randint(0, self.N - 1)
+            m = randint(0, self.M - 1)
             if  self.__pole_cels[n][m].is_mine != True:
                 self.__pole_cels[n][m].is_mine = True
                 total += 1
@@ -54,12 +54,6 @@ class GamePole:
     @property
     def pole(self):
         return self.__pole_cels
-
-    def __call__(self, *args, **kwargs):
-        if self.count == 0:
-            self.count += 1
-            return self.__init__(*args, **kwargs)
-
 
 
 class Cell:
@@ -102,7 +96,8 @@ class Cell:
         else:
             raise ValueError("недопустимое значение атрибута")
 
-
+    def __bool__(self):
+        return self.__is_open == False
 
 
 
@@ -126,6 +121,9 @@ class Cell:
 
 p1 = GamePole(10, 20, 10)
 p2 = GamePole(10, 20, 10)
+print(id(p1))
+print(id(p2))
+print(id(p1) == id(p2))
 assert id(p1) == id(p2), "создается несколько объектов класса GamePole"
 p = p1
 
@@ -136,6 +134,8 @@ assert type(Cell.is_mine) == property and type(Cell.number) == property and type
 cell.is_mine = True
 cell.number = 5
 cell.is_open = True
+print(bool(cell))
+print(bool(cell) == False)
 assert bool(cell) == False, "функция bool() вернула неверное значение"
 
 try:
