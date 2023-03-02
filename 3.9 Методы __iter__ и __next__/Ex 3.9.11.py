@@ -1,27 +1,28 @@
 class Matrix:
     def __init__(self, *args):
+        if (isinstance(args[0], (int, float))) and \
+            all([isinstance(arg, (int, float)) for arg in args]):
+                self.rows = args[0]
+                self.cols = args[1]
+                self.fill_value = args[2]
+                self.table = [[self.fill_value for col in range(self.cols)]for row in range(self.rows)]
+        elif isinstance(args[0][0], list):
+            if self.valid_table(args[0]):
+                self.rows = len(args[0])
+                self.cols = len(args[0][0])
+                self.table = args[0]
+        else:
+            raise TypeError('аргументы rows, cols - целые числа; fill_value - произвольное число')
 
-        if (isinstance(args[0], (int, float))) and all([isinstance(arg, (int, float)) for arg in args]):
-            self.rows = args[0]
-            self.cols = args[1]
-            self.fill_value = args[2]
-            self.table = [[self.fill_value for col in range(self.cols)]for row in range(self.rows)]
-        l = [all([isinstance(arg[0], (int, float)),  isinstance(arg[0],(int, float))]) for arg in args[0]]
-        print(l)
-        # elif isinstance(args[0][0], list):
-        #     # if self.valid_table(args[0]):
-        #     #     self.rows = len(args[0])
-        #     #     self.cols = len(args[0][0])
-        #     #     self.table = args[0]
-        # else:
-        #     raise TypeError('аргументы rows, cols - целые числа; fill_value - произвольное число')
 
     def valid_table(self, list):
         if all([len(l) == len(list[0]) for l in list]):
-            return True
+            if all([all([isinstance(arg[0], (int, float)), isinstance(arg[1], (int, float))]) for arg in list]):
+                return True
+            else:
+                raise TypeError('список должен быть прямоугольным, состоящим из чисел')
         else:
             raise TypeError('список должен быть прямоугольным, состоящим из чисел')
-
 
     def valid_index(self, item):
         if all([isinstance(item[0], int) and 0 <= item[0] < self.rows,
@@ -41,28 +42,30 @@ class Matrix:
             return self.table[item[0]][item[1]]
 
     def __setitem__(self, key, value):
-        if self.valid_index(key):
+        if self.valid_index(key) and self.valid_data(value):
             self.table[key[0]][key[1]] = value
 
 
     def __add__(self, other):
         if isinstance(other, int):
              return (other + self)
-        elif self.valid_table(self.table) and self.valid_table(other.table) \
-                and len(self.table[0]) == len(other.table[0]):
+        elif len(self.table[0]) == len(other.table[0]) and len(self.table) == len(other.table):
             list = [[self.table[i][j] + other.table[i][j] for j in range(len(self.table[0]))]for i in range(len(self.table))]
             return Matrix(list)
+        else:
+            raise ValueError('операции возможны только с матрицами равных размеров')
 
     def __radd__(self, other):
-        return Matrix( list(map(lambda x:  [x[0] + other,  x[1] + other], self.table)))
+        return Matrix(list(map(lambda x:  [x[0] + other,  x[1] + other], self.table)))
 
     def __sub__(self, other):
         if isinstance(other, int):
              return (other - self)
-        elif self.valid_table(self.table) and self.valid_table(other.table) \
-                and len(self.table[0]) == len(other.table[0]):
+        elif len(self.table[0]) == len(other.table[0]) and len(self.table) == len(other.table):
             list = [[self.table[i][j] - other.table[i][j] for j in range(len(self.table[0]))]for i in range(len(self.table))]
             return Matrix(list)
+        else:
+            raise ValueError('операции возможны только с матрицами равных размеров')
 
     def __rsub__(self, other):
         return Matrix( list(map(lambda x:  [x[0] - other,  x[1] - other], self.table)))
