@@ -1,5 +1,5 @@
 class GenericView:
-    def __init__(self, methods=('GET', 'POST')):
+    def __init__(self, methods=('GET',)):
         self.methods = methods
 
     def get(self, request):
@@ -16,18 +16,24 @@ class GenericView:
 
 
 class DetailView(GenericView):
-    def __init__(self, methods):
-        super().__init__()
-        self.methods = methods
+    def __init__(self, methods=None):
+        if methods == None:
+            super().__init__()
+        else:
+            self.methods = methods
+
 
     def validate(self, method):
         return method in self.methods
 
     def get(self, request):
         if isinstance(request, dict):
-            return f"url: {request['url']}"
+            if 'url' in request.keys():
+                return f"url: {request['url']}"
+            else:
+                raise TypeError('request не содержит обязательного ключа url')
         else:
-            raise TypeError('request не содержит обязательного ключа url')
+            raise TypeError('request не является словарем')
 
     def render_request(self, request, method):
         if self.validate(method):
@@ -35,17 +41,20 @@ class DetailView(GenericView):
         else:
             raise TypeError('данный запрос не может быть выполнен')
 
-    def __getattribute__(self, item):
-        return object.__getattribute__(self, item)
+    # def __getattribute__(self, item):
+    #     return object.__getattribute__(self, item)
 
 
 
 
 
 
-dv = DetailView(methods=('GET', 'POST'))
-#dv = DetailView()
+#dv = DetailView(methods=('GET', 'PUT'))
+dv = DetailView()
 html = dv.render_request({'url': 'https://site.ru/home'}, 'GET')   # url: https://site.ru/home
-html2 = dv.render_request({'url': 'https://site.ru/home'}, 'POST')   # url: https://site.ru/home
+#html2 = dv.render_request({'url': 'https://site.ru/home'}, 'POST')   # url: https://site.ru/home
+html3 = dv.render_request({'url': 'https://prop.ru/home'}, 'PUT')   # url: https://site.ru/home
+
 print(html)
-print(html2)
+#print(html2)
+print(html3)
