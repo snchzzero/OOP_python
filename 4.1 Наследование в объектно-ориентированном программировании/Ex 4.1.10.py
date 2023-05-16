@@ -7,13 +7,10 @@ class Layer:
         self.next_layer = object
         return object
 
-    def __iter__(self):
-        return self.next_layer
 
 class Input(Layer):  # формирование входного слоя нейронной сети
     def __init__(self, inputs):
         super().__init__()
-        super().__iter__()
         self.name = 'Input'
         self.inputs = inputs
 
@@ -21,22 +18,35 @@ class Input(Layer):  # формирование входного слоя ней
 class Dense(Layer):  # формирование полносвязного слоя нейронной сети
     def __init__(self, inputs, outputs, activation):
         super().__init__()
-        super().__iter__()
         self.name = 'Dense'
         self.inputs = inputs
         self.outputs = outputs
         self.activation = activation
 
+
 class NetworkIterator:
+
     def __init__(self, layer):
         self.layer = layer
+        self.next = self.layer
 
     def __iter__(self):
-        return self.layer.next_layer
+        return self
 
     def __next__(self):
-        if self.layer.next_layer != None:
-            return self.layer.next_layer.name
+        self.layer = self.next
+        if self.layer != None:
+            self.next = self.layer.next_layer
+            return self.layer
+        else:
+            raise StopIteration
+
+
+
+
+
+
+
 
 
 
@@ -53,6 +63,7 @@ layer = layer(Dense(layer.inputs, 10, 'softmax'))
 n = 0
 for x in NetworkIterator(nt):
     print(x)
+    print(x.name)
     assert isinstance(x, Layer), "итератор должен возвращать объекты слоев с базовым классом Layer"
     n += 1
 
