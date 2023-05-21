@@ -1,3 +1,4 @@
+
 class Thing:
     def __init__(self, name, price, weight):
         self.name = name
