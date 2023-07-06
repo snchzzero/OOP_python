@@ -36,13 +36,41 @@ class LinkedGraph:
         self._vertex = []
 
     def add_vertex(self, v):
-        if v not in self._vertex:
-            self._vertex.append(v)
+            if v not in self._vertex:
+                self._vertex.append(v)
 
     def add_link(self, link):
-        if link not in self._links:
+
+        if all([link.v1 not in v1v2 or link.v2 not in v1v2 for v1v2 in [[lnk.v1, lnk.v2] for lnk in self._links]]):
             self._links.append(link)
+            self.add_vertex(link.v1)
+            self.add_vertex(link.v2)
+
 
     def find_path(self, start_v, stop_v):
         pass
 
+map_graph = LinkedGraph()
+
+v1 = Vertex()
+v2 = Vertex()
+v3 = Vertex()
+v4 = Vertex()
+v5 = Vertex()
+v6 = Vertex()
+v7 = Vertex()
+
+map_graph.add_link(Link(v1, v2))
+map_graph.add_link(Link(v2, v3))
+map_graph.add_link(Link(v1, v3))
+
+map_graph.add_link(Link(v4, v5))
+map_graph.add_link(Link(v6, v7))
+
+map_graph.add_link(Link(v2, v7))
+map_graph.add_link(Link(v3, v4))
+map_graph.add_link(Link(v5, v6))
+
+print(len(map_graph._links))   # 8 связей
+print(len(map_graph._vertex))  # 7 вершин
+path = map_graph.find_path(v1, v6)
