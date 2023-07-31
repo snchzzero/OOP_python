@@ -1,3 +1,6 @@
+import math
+
+
 class Vertex:
     def __init__(self):
         self._links = []
@@ -53,9 +56,20 @@ class LinkedGraph:
             self.add_vertex(link.v1)
             self.add_vertex(link.v2)
 
+    def matrix(self, start_v, stop_v):
+        matrix_dict = {}
+        for link in self._links:
+            if
+
+
+        pass
+
+
 
     def find_path(self, start_v, stop_v):
+        matrix = self.matrix(start_v, stop_v)
         pass
+
 
 
 class Station(Vertex):
@@ -124,6 +138,6 @@ map_metro.add_link(LinkMetro(v5, v6, 3))
 
 print(len(map_metro._links))
 print(len(map_metro._vertex))
-path = map_metro.find_path(v1, v6)  # от сретенского бульвара до китай-город 1
+#path = map_metro.find_path(v1, v6)  # от сретенского бульвара до китай-город 1
 print(path[0])    # [Сретенский бульвар, Тургеневская, Китай-город 2, Китай-город 1]
 print(sum([x.dist for x in path[1]]))  # 7
