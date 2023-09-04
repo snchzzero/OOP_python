@@ -18,10 +18,10 @@ class Link:
         self.add_link_vertex()
 
     def add_link_vertex(self):
-        if self._v2 not in self._v1._links:
-            self._v1._links.append(self._v2)
-        if self._v1 not in self._v2._links:
-            self._v2._links.append(self._v1)
+        if self not in self._v1._links:
+            self._v1._links.append(self)
+        if self not in self._v2._links:
+            self._v2._links.append(self)
 
     @property
     def v1(self):
@@ -56,10 +56,35 @@ class LinkedGraph:
             self.add_vertex(link.v1)
             self.add_vertex(link.v2)
 
+    def get_link_v(self, v, D):
+        for i, weight in enumerate(v.links):
+            if weight.dist > 0:
+                yield i
+
     def matrix(self, start_v, stop_v):
-        matrix_dict = {}
-        for link in self._links:
-            if
+        N = len(self._links)  # число вершин в графе
+        T = [math.inf] * N  # последняя строка таблицы
+
+        v = start_v  # стартовая вершина (нумерация с нуля)
+        S = {v}  # просмотренные вершины
+        T[v] = 0  # нулевой вес для стартовой вершины
+        M = [0] * N  # оптимальные связи между вершинами
+
+        while v != -1:  # цикл, пока не просмотрим все вершины
+            for j in self.get_link_v(v):  # перебираем все связанные вершины с вершиной v
+                if j not in S:  # если вершина еще не просмотрена
+                    w = T[v] + self._vertex[v][j]
+                    if w < T[j]:
+                        T[j] = w
+                        M[j] = v  # связываем вершину j с вершиной v
+
+            v = arg_min(T, S)  # выбираем следующий узел с наименьшим весом
+            if v >= 0:  # выбрана очередная вершина
+                S.add(v)  # добавляем новую вершину в рассмотрение
+
+        print(T)
+
+
 
 
         pass
@@ -139,5 +164,5 @@ map_metro.add_link(LinkMetro(v5, v6, 3))
 print(len(map_metro._links))
 print(len(map_metro._vertex))
 #path = map_metro.find_path(v1, v6)  # от сретенского бульвара до китай-город 1
-print(path[0])    # [Сретенский бульвар, Тургеневская, Китай-город 2, Китай-город 1]
-print(sum([x.dist for x in path[1]]))  # 7
+#print(path[0])    # [Сретенский бульвар, Тургеневская, Китай-город 2, Китай-город 1]
+#print(sum([x.dist for x in path[1]]))  # 7
