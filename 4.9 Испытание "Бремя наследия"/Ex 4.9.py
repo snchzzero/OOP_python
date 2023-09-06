@@ -56,44 +56,91 @@ class LinkedGraph:
             self.add_vertex(link.v1)
             self.add_vertex(link.v2)
 
-    def get_link_v(self, v, D):
-        for i, weight in enumerate(v.links):
-            if weight.dist > 0:
-                yield i
+    def get_index(self, vertex):
+        for index, vertex_iter in enumerate(self._vertex):
+            if vertex_iter == vertex:
+                return index # стартовая вершина (нумерация с нуля)
+        return 0
+
+    def arg_min(self, T, S):
+        amin = -1
+        m = max(T)  # максимальное значение в T (для упрощения алгоритма)
+        for index, t in enumerate(T):
+            if t < m and self._vertex[index] not in S.values():
+                m = t
+                amin = index
+
+        return amin
 
     def matrix(self, start_v, stop_v):
-        N = len(self._links)  # число вершин в графе
+        N = len(self._vertex)  # число вершин в графе
         T = [math.inf] * N  # последняя строка таблицы
 
-        v = start_v  # стартовая вершина (нумерация с нуля)
-        S = {v}  # просмотренные вершины
+        v = self.get_index(start_v)  # стартовая вершина (нумерация с нуля)
+        S = {v: self._vertex[v]}  # просмотренные вершины
         T[v] = 0  # нулевой вес для стартовой вершины
         M = [0] * N  # оптимальные связи между вершинами
 
         while v != -1:  # цикл, пока не просмотрим все вершины
-            for j in self.get_link_v(v):  # перебираем все связанные вершины с вершиной v
-                if j not in S:  # если вершина еще не просмотрена
-                    w = T[v] + self._vertex[v][j]
-                    if w < T[j]:
-                        T[j] = w
-                        M[j] = v  # связываем вершину j с вершиной v
-
-            v = arg_min(T, S)  # выбираем следующий узел с наименьшим весом
+            for j in self._vertex[v].links:  # перебираем все связанные вершины с вершиной v
+                if j.v2 not in S.values():  # если вершина еще не просмотрена
+                    w = T[v] + j.dist
+                    index_j = self.get_index(j.v2)
+                    if w < T[index_j]:
+                        T[index_j] = w
+                        M[index_j] = v  # связываем вершину j с вершиной v
+                if j.v1 not in S.values():
+                    w = T[v] + j.dist
+                    index_j = self.get_index(j.v1)
+                    if w < T[index_j]:
+                        T[index_j] = w
+                        M[index_j] = v
+            v = self.arg_min(T, S)  # выбираем следующий узел с наименьшим весом
             if v >= 0:  # выбрана очередная вершина
-                S.add(v)  # добавляем новую вершину в рассмотрение
+                #S.add(v)  # добавляем новую вершину в рассмотрение
+                S[v] = self._vertex[v]
 
-        print(T)
+        print(T)  # [0, 1, 1, 4, 5, 7, 6]
+
+        # формирование оптимального маршрута:
+        start = self.get_index(start_v)
+        end = self.get_index(stop_v)
+        P = [end]
+        while end != start:
+            end = M[P[-1]]
+            P.append(end)
+        P.reverse()
+
+        print(P)  # [5, 6, 1, 0] -> [0, 1, 6, 5]
+        return P
 
 
-
-
-        pass
 
 
 
     def find_path(self, start_v, stop_v):
-        matrix = self.matrix(start_v, stop_v)
-        pass
+        shotest_way_index = self.matrix(start_v, stop_v)
+        stations = [self._vertex[index] for index in shotest_way_index]
+        #print('stations ', stations)
+        links = []
+        for index in range(0, len(shotest_way_index)):
+            if index + 1 != len(shotest_way_index):
+                v1 = shotest_way_index[index]
+                v1_obj = self._vertex[v1]
+                v2 = shotest_way_index[index + 1]
+                v2_obj = self._vertex[v2]
+                for link in v1_obj.links:
+                    if (link.v1 == v1_obj and link.v2 == v2_obj) or (link.v1 == v2_obj and link.v2 == v1_obj):
+                        links.append(link)
+                        break
+        result = (stations, links)
+        return result
+
+
+
+
+
+
 
 
 
@@ -161,8 +208,8 @@ map_metro.add_link(LinkMetro(v2, v7, 5))
 map_metro.add_link(LinkMetro(v3, v4, 3))
 map_metro.add_link(LinkMetro(v5, v6, 3))
 
-print(len(map_metro._links))
-print(len(map_metro._vertex))
-#path = map_metro.find_path(v1, v6)  # от сретенского бульвара до китай-город 1
-#print(path[0])    # [Сретенский бульвар, Тургеневская, Китай-город 2, Китай-город 1]
-#print(sum([x.dist for x in path[1]]))  # 7
+print(len(map_metro._links))  # 8 связей
+print(len(map_metro._vertex))  # 7 вершин
+path = map_metro.find_path(v1, v6)  # от сретенского бульвара до китай-город 1
+print(path[0])    # [Сретенский бульвар, Тургеневская, Китай-город 2, Китай-город 1]
+print(sum([x.dist for x in path[1]]))  # 7

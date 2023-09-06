@@ -45,16 +45,16 @@ while v != -1:          # цикл, пока не просмотрим все в
     if v >= 0:                    # выбрана очередная вершина
         S.add(v)                 # добавляем новую вершину в рассмотрение
 
-print(T)
+print(T)  # [0, 3, 1, 3, 8, 5]
 
 #print(T, M, sep="\n")
 
-# # формирование оптимального маршрута:
-# start = 0
-# end = 4
-# P = [end]
-# while end != start:
-#     end = M[P[-1]]
-#     P.append(end)
-#
-# print(P)
+# формирование оптимального маршрута:
+start = 0
+end = 4
+P = [end]
+while end != start:
+    end = M[P[-1]]
+    P.append(end)
+
+print(P)   # [4, 2, 0]
