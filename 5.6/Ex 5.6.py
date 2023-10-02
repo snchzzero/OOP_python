@@ -52,7 +52,7 @@ class GamePole:
             self._ships.append(Ship(length, tp=random.randint(1, 2)))
 
         # initialization coords of ships
-        for ship in range(-1, -len(self._ships), -1):
+        for ship in range(-1, -len(self._ships) - 1, -1):
             ship = self._ships[ship]
             add_ship = False
             ship_coords = self.init_ship_coord(ship)
@@ -71,7 +71,7 @@ class GamePole:
                     xy_lb = [y - 1, x - 1] if x - 1 >= 0 and y - 1 >= 0 else None
                     for point in [check_point for check_point in [x_l, xy_lt, y_t, xy_rt, x_r, xy_rb, y_b, xy_lb] if
                                   check_point]:
-                        collide_one_ship_coord.append(self._pole[point[0]][point[1]] is 0)
+                        collide_one_ship_coord.append(self._pole[point[0]][point[1]] == 0)
                     if not all(collide_one_ship_coord):
                         ship_coords = self.init_ship_coord(ship)
                         collide = True
@@ -82,6 +82,8 @@ class GamePole:
             # add true coord in main pole
             for x, y in ship_coords:
                 self._pole[y][x] = 1
+            ship._x = ship_coords[0][0]
+            ship._y = ship_coords[0][1]
 
     def init_ship_coord(self, ship):
         flag = True
@@ -111,13 +113,6 @@ class GamePole:
         return ship_coords
 
 
-
-
-
-
-
-
-
     def get_ships(self):
         return self._ships
 
@@ -125,7 +120,10 @@ class GamePole:
         pass
 
     def show(self):
-        pass
+        show_str = ""
+        for row in self._pole:
+            show_str += str(row).replace('[', '').replace(']', '') + '\n'
+        print(show_str)
 
     def get_pole(self):
         pass
@@ -135,5 +133,7 @@ SIZE_GAME_POLE = 10
 
 pole = GamePole(SIZE_GAME_POLE)
 pole.init()
+pole.show()
+pole.show()
 
 
