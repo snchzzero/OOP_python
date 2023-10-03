@@ -14,26 +14,36 @@ class Ship:
         self._x = x
         self._y = y
 
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, x):
+        self._x = x
+
+    @property
+    def y(self):
+        return self._y
+
+    @y.setter
+    def y(self, y):
+        self._y = y
+
+
     def get_start_coords(self):
         return tuple(self._x, self._y)
 
-    def move(go):
-        pass
+    def move(self, go):
+        if self._is_move:
+            if self._tp == 1:
+                self._x = self._x + go
+            elif self._tp == 2:
+                self._y = self._y + go
+
+
 
     def is_collide(self, ship):
-
-        ship_coords_other = [[ship._x, ship._y]]
-        for cel in range(1, ship._length):
-            if ship._tp == 1:
-                ship_coords_other.append([
-                    ship_coords_other[-1][0] + 1,
-                    ship_coords_other[-1][1]
-                ])
-            if ship._tp == 2:
-                ship_coords_other.append([
-                    ship_coords_other[-1][0],
-                    ship_coords_other[-1][1] + 1
-                ])
 
         for x, y in self._ship_coords:
             x_l = [y, x - 1]
@@ -44,17 +54,17 @@ class Ship:
             xy_rb = [y - 1, x + 1]
             y_b = [y - 1, x]
             xy_lb = [y - 1, x - 1]
-        if not all(point not in ship_coords_other for point in [x_l, xy_lt, y_t, xy_rt, x_r, xy_rb, y_b, xy_lb]):
-            del self._ship_coords
-            return True
+            if not all([point[1], point[0]] not in ship._ship_coords for point in [[y, x], x_l, xy_lt, y_t, xy_rt, x_r, xy_rb, y_b, xy_lb]):
+                del self._ship_coords
+                return True
         return False
 
     def is_out_pole(self, size):
         if self._tp == 1:
-            if self._x + self._length > size:
+            if self._x + self._length > size or self._x < 0:
                 return True
         if self._tp == 2:
-            if self._y + self._length > size:
+            if self._y + self._length > size or self._y < 0:
                 return True
         return False
 
@@ -98,68 +108,27 @@ class GamePole:
                             break
                 if collide:
                     self.init_ship_coord(ship)
-                add_ship = True
+                else:
+                    add_ship = True
 
             # add true coord in main pole
             for x, y in ship._ship_coords:
                 self._pole[y][x] = 1
 
 
-
-
-
-
-
-
-
-            # add_ship = False
-            # ship_coords = self.init_ship_coord(ship)
-            #
-            # while add_ship is False:
-            #     collide = False
-            #     for x, y in ship_coords:
-            #         collide_one_ship_coord = []
-            #         x_l = [y, x - 1] if x - 1 >= 0 else None
-            #         xy_lt = [y + 1, x - 1] if x - 1 >= 0 and y + 1 < self._size else None
-            #         y_t = [y + 1, x] if y + 1 < self._size else None
-            #         xy_rt = [y + 1, x + 1] if y + 1 < self._size and x + 1 < self._size else None
-            #         x_r = [y, x + 1] if x + 1 < self._size else None
-            #         xy_rb = [y - 1, x + 1] if x + 1 < self._size and y - 1 >= 0 else None
-            #         y_b = [y - 1, x] if y - 1 >= 0 else None
-            #         xy_lb = [y - 1, x - 1] if x - 1 >= 0 and y - 1 >= 0 else None
-            #         for point in [check_point for check_point in [x_l, xy_lt, y_t, xy_rt, x_r, xy_rb, y_b, xy_lb] if
-            #                       check_point]:
-            #             collide_one_ship_coord.append(self._pole[point[0]][point[1]] == 0)
-            #         if not all(collide_one_ship_coord):
-            #             ship_coords = self.init_ship_coord(ship)
-            #             collide = True
-            #             break
-            #     if not collide:
-            #         add_ship = True
-
-            # add true coord in main pole
-            # for x, y in ship_coords:
-            #     self._pole[y][x] = 1
-            # ship._x = ship_coords[0][0]
-            # ship._y = ship_coords[0][1]
-
-    def init_ship_coord(self, ship):
+    def init_ship_coord(self, ship, x_start=None, y_start=None):
         flag = True
-        while flag:
-            x_start = random.randrange(0, self._size)
-            y_start = random.randrange(0, self._size)
+        if x_start is None and y_start is None:
+            while flag:
+                x_start = random.randrange(0, self._size)
+                y_start = random.randrange(0, self._size)
+                ship.set_start_coords(x_start, y_start)
+                flag = ship.is_out_pole(self._size)
+
+        if x_start and y_start:
             ship.set_start_coords(x_start, y_start)
-            flag = ship.is_out_pole(self._size)
-
-
-
-            # if ship._tp == 1:
-            #     if not x_start + ship._length > self._size:
-            #         flag = False
-            # if ship._tp == 2:
-            #     if not y_start + ship._length > self._size:
-            #         flag = False
-
+            if ship.is_out_pole(self._size):
+                return True
 
         # fill by length, tp
         ship._ship_coords = [[x_start, y_start]]
@@ -179,12 +148,59 @@ class GamePole:
         return self._ships
 
     def move_ships(self):
-        pass
+        mover_ship = []
+        for ship in self._ships:
+            forward_backward = random.choice([-1, 1])
+            old_x = ship._x
+            old_y = ship._y
+            old_ship_coords = ship._ship_coords
+            #flag = True
+            for trying_move in [forward_backward, forward_backward * -1]:
+                flag = True
+                if ship._tp == 1:
+                    new_x = old_x + trying_move
+                    new_y = old_y
+                elif ship._tp == 2:
+                    new_x = old_x
+                    new_y = old_y + trying_move
+                if self.init_ship_coord(ship, x_start=new_x, y_start=new_y):
+                    flag = False
+                    continue
+
+                result_collid = []
+
+                for other_ship in self._ships:
+
+                    if ship != other_ship:
+                        if ship.is_collide(other_ship):
+                            self.init_ship_coord(ship, x_start=old_x, y_start=old_y)
+                            flag = False
+                            break
+
+                if not flag:
+                    continue
+
+                if flag:  # если успешно переместили на клетку
+                    self._pole[old_y][old_x] = 0
+                    self._pole[ship._y][ship._x] = 1
+                    mover_ship.append(ship)
+                    break
+
+            if not flag:
+                mover_ship.append(ship)
+                self.init_ship_coord(ship, x_start=old_x, y_start=old_y)
+                continue
+
+
+
+
+
+
 
     def show(self):
         show_str = ""
         for row in self._pole:
-            show_str += str(row).replace('[', '').replace(']', '') + '\n'
+            show_str += str(row).replace('[', '').replace(']', '').replace(',', ' ') + '\n'
         print(show_str)
 
     def get_pole(self):
@@ -196,6 +212,9 @@ SIZE_GAME_POLE = 10
 pole = GamePole(SIZE_GAME_POLE)
 pole.init()
 pole.show()
+pole.move_ships()
 pole.show()
+pole.show()
+
 
 
