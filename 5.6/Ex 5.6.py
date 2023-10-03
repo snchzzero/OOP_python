@@ -8,7 +8,7 @@ class Ship:
         self._tp = tp
         self._is_move = True
         self._cells = [1 for _ in range(self._length)]
-        self._ship_coords = []
+        self.ship_coords = []
 
     def set_start_coords(self, x, y):
         self._x = x
@@ -45,7 +45,7 @@ class Ship:
 
     def is_collide(self, ship):
 
-        for x, y in self._ship_coords:
+        for x, y in self.ship_coords:
             x_l = [y, x - 1]
             xy_lt = [y + 1, x - 1]
             y_t = [y + 1, x]
@@ -54,8 +54,8 @@ class Ship:
             xy_rb = [y - 1, x + 1]
             y_b = [y - 1, x]
             xy_lb = [y - 1, x - 1]
-            if not all([point[1], point[0]] not in ship._ship_coords for point in [[y, x], x_l, xy_lt, y_t, xy_rt, x_r, xy_rb, y_b, xy_lb]):
-                del self._ship_coords
+            if not all([point[1], point[0]] not in ship.ship_coords for point in [[y, x], x_l, xy_lt, y_t, xy_rt, x_r, xy_rb, y_b, xy_lb]):
+                del self.ship_coords
                 return True
         return False
 
@@ -112,7 +112,7 @@ class GamePole:
                     add_ship = True
 
             # add true coord in main pole
-            for x, y in ship._ship_coords:
+            for x, y in ship.ship_coords:
                 self._pole[y][x] = 1
 
 
@@ -131,16 +131,16 @@ class GamePole:
                 return True
 
         # fill by length, tp
-        ship._ship_coords = [[x_start, y_start]]
+        ship.ship_coords = [[x_start, y_start]]
         for col_coord in range(ship._length - 1):
             if ship._tp == 1:
-                x = ship._ship_coords[-1][0] + 1
-                y = ship._ship_coords[-1][1]
-                ship._ship_coords.append([x, y])
+                x = ship.ship_coords[-1][0] + 1
+                y = ship.ship_coords[-1][1]
+                ship.ship_coords.append([x, y])
             if ship._tp == 2:
-                x = ship._ship_coords[-1][0]
-                y = ship._ship_coords[-1][1] + 1
-                ship._ship_coords.append([x, y])
+                x = ship.ship_coords[-1][0]
+                y = ship.ship_coords[-1][1] + 1
+                ship.ship_coords.append([x, y])
 
 
 
@@ -153,7 +153,7 @@ class GamePole:
             forward_backward = random.choice([-1, 1])
             old_x = ship._x
             old_y = ship._y
-            old_ship_coords = ship._ship_coords
+            old_ship_coords = ship.ship_coords
             #flag = True
             for trying_move in [forward_backward, forward_backward * -1]:
                 flag = True
@@ -164,6 +164,7 @@ class GamePole:
                     new_x = old_x
                     new_y = old_y + trying_move
                 if self.init_ship_coord(ship, x_start=new_x, y_start=new_y):
+                    self.init_ship_coord(ship, x_start=old_x, y_start=old_y)
                     flag = False
                     continue
 
@@ -181,8 +182,11 @@ class GamePole:
                     continue
 
                 if flag:  # если успешно переместили на клетку
-                    self._pole[old_y][old_x] = 0
-                    self._pole[ship._y][ship._x] = 1
+                    for old_ship_x, old_ship_y in old_ship_coords:
+
+                        self._pole[old_ship_y][old_ship_x] = 0
+                    for new_ship_x, new_ship_y in ship.ship_coords:
+                        self._pole[new_ship_y][new_ship_x] = 1
                     mover_ship.append(ship)
                     break
 
